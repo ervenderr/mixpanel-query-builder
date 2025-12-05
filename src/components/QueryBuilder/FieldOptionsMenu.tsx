@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type ReactElement } from 'react';
 import type { FieldType } from '@/types';
 
 interface FieldOptionsMenuProps {
@@ -35,7 +35,7 @@ export default function FieldOptionsMenu({ currentType, onTypeChange, onMapLooku
     setShowDataTypeSubmenu(false);
   };
 
-  const dataTypes: { value: FieldType; label: string; icon: JSX.Element }[] = [
+  const dataTypes: { value: FieldType; label: string; icon: ReactElement }[] = [
     {
       value: 'string',
       label: 'String',
