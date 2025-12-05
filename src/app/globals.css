@@ -1,26 +1,43 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Mixpanel color system */
+  --primary-color: #4f44e0;
+  --primary-color-rgb: 79, 68, 224;
+  --blue1: #4f44e0;
+  --blue2: #463dbb;
+  --blue3: #322e6f;
+
+  --gray0: #fff;
+  --gray1: #f6f6f6;
+  --gray2: #e9e9e9;
+  --gray3: #8f8f91;
+  --gray4: #626266;
+  --gray5: #2a2a2f;
+
+  --primary-text-color: #2a2a2f;
+  --secondary-text-color: #626266;
+  --tertiary-text-color: #8f8f91;
+
+  --component-hover-color: #f6f6f6;
+  --component-outline-color: #e9e9e9;
+
+  --benchmark-secondary-color: #edecfc;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+  --font-sans: "Apercu", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: #fff;
+  color: var(--primary-text-color);
+  font-family: var(--font-sans);
+  font-weight: 300;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  font-weight: 300;
 }

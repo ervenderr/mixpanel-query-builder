@@ -1,0 +1,86 @@
+import type { User } from '@/types';
+
+// Realistic dummy data for testing filters
+// Mix of companies, dates, and employee counts to test all scenarios
+export const dummyUsers: User[] = [
+  {
+    id: '1',
+    name: 'Sarah Chen',
+    company: '7Gen Corp',
+    employees: 42,
+    created: new Date('2023-06-15'),
+    lastSeen: new Date('2024-12-02'),
+  },
+  {
+    id: '2',
+    name: 'Marcus Rodriguez',
+    company: 'JM Company',
+    employees: 150,
+    created: new Date('2024-01-20'),
+    lastSeen: new Date('2024-12-03'),
+  },
+  {
+    id: '3',
+    name: 'Emily Watson',
+    company: 'A.D. Edwards Inc',
+    employees: 8,
+    created: new Date('2023-09-10'),
+    lastSeen: new Date('2024-11-28'),
+  },
+  {
+    id: '4',
+    name: 'James Kim',
+    company: '7Gen Corp',
+    employees: 42,
+    created: new Date('2024-03-05'),
+    lastSeen: new Date('2024-12-04'),
+  },
+  {
+    id: '5',
+    name: 'Lisa Thompson',
+    company: 'Nevada Jefferson',
+    employees: 250,
+    created: new Date('2022-11-30'),
+    lastSeen: new Date('2024-12-01'),
+  },
+  {
+    id: '6',
+    name: 'David Park',
+    company: 'Acme Solutions',
+    employees: 15,
+    created: new Date('2024-02-14'),
+    lastSeen: new Date('2024-11-30'),
+  },
+  {
+    id: '7',
+    name: 'Rachel Green',
+    company: 'JM Company',
+    employees: 150,
+    created: new Date('2023-12-01'),
+    lastSeen: new Date('2024-12-03'),
+  },
+  {
+    id: '8',
+    name: 'Tom Anderson',
+    company: 'StartupXYZ',
+    employees: 5,
+    created: new Date('2024-05-22'),
+    lastSeen: new Date('2024-12-04'),
+  },
+  {
+    id: '9',
+    name: 'Maria Garcia',
+    company: 'Nevada Jefferson',
+    employees: 250,
+    created: new Date('2023-08-17'),
+    lastSeen: new Date('2024-11-29'),
+  },
+  {
+    id: '10',
+    name: 'Alex Johnson',
+    company: 'Tech Innovations',
+    employees: 75,
+    created: new Date('2024-04-10'),
+    lastSeen: new Date('2024-12-02'),
+  },
+];
