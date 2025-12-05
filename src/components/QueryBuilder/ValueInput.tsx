@@ -11,7 +11,7 @@ interface ValueInputProps {
 
 export default function ValueInput({ type, value, onChange }: ValueInputProps) {
   const baseClasses =
-    'bg-transparent border-0 outline-none text-sm text-[#2a2a2f] placeholder:text-[#8f8f91] font-light pointer-events-auto';
+    'bg-transparent border-0 outline-none text-sm text-[#2a2a2f] placeholder:text-[#8f8f91] font-light';
 
   if (type === 'number') {
     return (
@@ -20,7 +20,7 @@ export default function ValueInput({ type, value, onChange }: ValueInputProps) {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder="0"
-        className={`${baseClasses} w-20`}
+        className={`${baseClasses} w-full`}
       />
     );
   }
@@ -35,7 +35,7 @@ export default function ValueInput({ type, value, onChange }: ValueInputProps) {
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder="Enter value..."
-      className={`${baseClasses} w-32`}
+      className={`${baseClasses} w-full`}
     />
   );
 }

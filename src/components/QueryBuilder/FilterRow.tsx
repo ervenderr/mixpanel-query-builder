@@ -47,7 +47,7 @@ export default function FilterRow({
       </span>
 
       {/* Field pill - outline on hover instead of border */}
-      <div className="flex items-center gap-1.5 bg-[#f6f6f6] hover:bg-[#edecfc] hover:outline hover:outline-2 hover:outline-[#4f44e0] rounded-md px-2.5 py-1.5 transition-all cursor-pointer pointer-events-none">
+      <div className="flex items-center gap-1.5 bg-[#f6f6f6] hover:bg-[#edecfc] hover:outline hover:outline-2 hover:outline-[#4f44e0] rounded-md px-2.5 py-1.5 transition-all">
         <FieldIcon icon={selectedField?.icon} />
         <FieldSelectDropdown value={field} onChange={(val) => onFieldChange(id, val)} />
       </div>
@@ -55,7 +55,7 @@ export default function FilterRow({
       {selectedField && (
         <>
           {/* Operator pill - outline on hover */}
-          <div className="bg-[#f6f6f6] hover:bg-[#edecfc] hover:outline hover:outline-2 hover:outline-[#4f44e0] rounded-md px-2.5 py-1.5 transition-all cursor-pointer pointer-events-none">
+          <div className="bg-[#f6f6f6] hover:bg-[#edecfc] hover:outline hover:outline-2 hover:outline-[#4f44e0] rounded-md px-2.5 py-1.5 transition-all">
             <OperatorSelectDropdown
               operators={selectedField.operators}
               value={operator}
@@ -64,7 +64,7 @@ export default function FilterRow({
           </div>
 
           {/* Value pill - outline on hover, purple border for date */}
-          <div className={`rounded-md px-2.5 py-1.5 min-w-[120px] transition-all pointer-events-none ${
+          <div className={`rounded-md px-2.5 py-1.5 min-w-[120px] transition-all ${
             selectedField.type === 'date'
               ? 'bg-white border-2 border-[#4f44e0]'
               : 'bg-[#f6f6f6] hover:bg-[#edecfc] hover:outline hover:outline-2 hover:outline-[#4f44e0]'

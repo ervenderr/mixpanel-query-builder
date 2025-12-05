@@ -95,7 +95,7 @@ export default function DatePickerDropdown({ value, onChange }: DatePickerDropdo
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-transparent border-0 outline-none text-sm text-[#2a2a2f] cursor-pointer font-light hover:text-[#4f44e0] transition-colors pointer-events-auto"
+        className="bg-transparent border-0 outline-none text-sm text-[#2a2a2f] cursor-pointer font-light hover:text-[#4f44e0] transition-colors w-full text-left"
       >
         {value || '7 days'}
       </button>
