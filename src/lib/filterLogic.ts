@@ -188,6 +188,121 @@ function evaluateRule(user: User, rule: any): boolean {
 
           return isEqual(userDate, cutoffDate) || isAfter(userDate, cutoffDate);
         }
+        case 'notInTheLast': {
+          // Opposite of 'last' - user date is NOT in the last X days/weeks/months/years
+          const [amount, unit] = String(compareValue).split(',');
+          const num = parseInt(amount, 10);
+          if (isNaN(num)) return false;
+
+          const now = new Date(new Date().toDateString());
+          const msPerDay = 24 * 60 * 60 * 1000;
+          let cutoffDate: Date;
+
+          switch (unit) {
+            case 'days':
+              cutoffDate = new Date(now.getTime() - num * msPerDay);
+              break;
+            case 'weeks':
+              cutoffDate = new Date(now.getTime() - num * 7 * msPerDay);
+              break;
+            case 'months':
+              cutoffDate = new Date(now);
+              cutoffDate.setMonth(cutoffDate.getMonth() - num);
+              break;
+            case 'years':
+              cutoffDate = new Date(now);
+              cutoffDate.setFullYear(cutoffDate.getFullYear() - num);
+              break;
+            default:
+              return false;
+          }
+
+          return isBefore(userDate, cutoffDate);
+        }
+        case 'beforeTheLast': {
+          // Before the last X days/weeks/months/years - same as notInTheLast
+          const [amount, unit] = String(compareValue).split(',');
+          const num = parseInt(amount, 10);
+          if (isNaN(num)) return false;
+
+          const now = new Date(new Date().toDateString());
+          const msPerDay = 24 * 60 * 60 * 1000;
+          let cutoffDate: Date;
+
+          switch (unit) {
+            case 'days':
+              cutoffDate = new Date(now.getTime() - num * msPerDay);
+              break;
+            case 'weeks':
+              cutoffDate = new Date(now.getTime() - num * 7 * msPerDay);
+              break;
+            case 'months':
+              cutoffDate = new Date(now);
+              cutoffDate.setMonth(cutoffDate.getMonth() - num);
+              break;
+            case 'years':
+              cutoffDate = new Date(now);
+              cutoffDate.setFullYear(cutoffDate.getFullYear() - num);
+              break;
+            default:
+              return false;
+          }
+
+          return isBefore(userDate, cutoffDate);
+        }
+        case 'inTheNext': {
+          // In the next X days/weeks/months/years - date is between now and now + X
+          const [amount, unit] = String(compareValue).split(',');
+          const num = parseInt(amount, 10);
+          if (isNaN(num)) return false;
+
+          const now = new Date(new Date().toDateString());
+          const msPerDay = 24 * 60 * 60 * 1000;
+          let futureDate: Date;
+
+          switch (unit) {
+            case 'days':
+              futureDate = new Date(now.getTime() + num * msPerDay);
+              break;
+            case 'weeks':
+              futureDate = new Date(now.getTime() + num * 7 * msPerDay);
+              break;
+            case 'months':
+              futureDate = new Date(now);
+              futureDate.setMonth(futureDate.getMonth() + num);
+              break;
+            case 'years':
+              futureDate = new Date(now);
+              futureDate.setFullYear(futureDate.getFullYear() + num);
+              break;
+            default:
+              return false;
+          }
+
+          return (isEqual(userDate, now) || isAfter(userDate, now)) &&
+                 (isEqual(userDate, futureDate) || isBefore(userDate, futureDate));
+        }
+        case 'on': {
+          // Same as '=' for dates
+          const compareDate = new Date(compareValue);
+          if (isNaN(compareDate.getTime())) return false;
+          const testDate = new Date(compareDate.toDateString());
+          return isEqual(userDate, testDate);
+        }
+        case 'notOn': {
+          // Same as '!=' for dates
+          const compareDate = new Date(compareValue);
+          if (isNaN(compareDate.getTime())) return false;
+          const testDate = new Date(compareDate.toDateString());
+          return !isEqual(userDate, testDate);
+        }
+        case 'since': {
+          // On or after a specific date
+          const compareDate = new Date(compareValue);
+          if (isNaN(compareDate.getTime())) return false;
+          const testDate = new Date(compareDate.toDateString());
+          return isEqual(userDate, testDate) || isAfter(userDate, testDate);
+        }
         default:
           return false;
       }
