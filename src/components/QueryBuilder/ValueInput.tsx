@@ -60,31 +60,9 @@ export default function ValueInput({ type, operator, value, onChange }: ValueInp
     );
   }
 
-  // Handle "last" operator for dates - needs number and unit
+  // Handle "last" operator for dates - use enhanced calendar dropdown
   if (type === 'date' && operator === 'last') {
-    const [amount, unit] = value.split(',');
-    return (
-      <div className="flex items-center gap-2">
-        <input
-          type="number"
-          value={amount || ''}
-          onChange={(e) => onChange(`${e.target.value},${unit || 'days'}`)}
-          placeholder="7"
-          className={`${baseClasses} w-12`}
-          min="1"
-        />
-        <select
-          value={unit || 'days'}
-          onChange={(e) => onChange(`${amount || '7'},${e.target.value}`)}
-          className={`${baseClasses} cursor-pointer`}
-        >
-          <option value="days">days</option>
-          <option value="weeks">weeks</option>
-          <option value="months">months</option>
-          <option value="years">years</option>
-        </select>
-      </div>
-    );
+    return <DatePickerDropdown value={value} onChange={onChange} />;
   }
 
   if (type === 'number') {
