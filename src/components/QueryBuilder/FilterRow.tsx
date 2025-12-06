@@ -21,6 +21,8 @@ interface FilterRowProps {
   onDuplicate?: (id: string) => void;
   showRemove: boolean;
   showAnd: boolean;
+  combinator?: 'and' | 'or';
+  onCombinatorToggle?: () => void;
 }
 
 export default function FilterRow({
@@ -34,6 +36,8 @@ export default function FilterRow({
   onRemove,
   onDuplicate,
   showAnd,
+  combinator = 'and',
+  onCombinatorToggle,
 }: FilterRowProps) {
   const selectedField = fields.find((f) => f.name === field);
   const [showLookupModal, setShowLookupModal] = useState(false);
@@ -41,10 +45,18 @@ export default function FilterRow({
   return (
     <>
       <div className="flex items-center gap-3">
-      {/* where/and label */}
-      <span className="text-sm text-[#8f8f91] min-w-[48px]">
-        {showAnd ? 'and' : 'where'}
-      </span>
+      {/* where/and/or label - clickable when showAnd is true */}
+      {showAnd ? (
+        <button
+          onClick={onCombinatorToggle}
+          className="text-sm text-[#4f44e0] min-w-[48px] hover:underline cursor-pointer bg-transparent border-0 outline-none font-medium"
+          title="Click to toggle between AND/OR"
+        >
+          {combinator}
+        </button>
+      ) : (
+        <span className="text-sm text-[#8f8f91] min-w-[48px]">where</span>
+      )}
 
       {/* Field pill - outline on hover instead of border */}
       <div className="flex items-center gap-1.5 bg-[#f6f6f6] hover:bg-[#edecfc] hover:outline hover:outline-2 hover:outline-[#4f44e0] rounded-md px-2.5 py-1.5 transition-all">
@@ -63,18 +75,21 @@ export default function FilterRow({
             />
           </div>
 
-          {/* Value pill - outline on hover, purple border for date */}
-          <div className={`rounded-md px-2.5 py-1.5 min-w-[120px] transition-all ${
-            selectedField.type === 'date'
-              ? 'bg-white border-2 border-[#4f44e0]'
-              : 'bg-[#f6f6f6] hover:bg-[#edecfc] hover:outline hover:outline-2 hover:outline-[#4f44e0]'
-          }`}>
-            <ValueInput
-              type={selectedField.type}
-              value={value}
-              onChange={(val) => onValueChange(id, val)}
-            />
-          </div>
+          {/* Value pill - only show if operator requires a value */}
+          {!['isSet', 'isNotSet', 'isNumeric', 'isNotNumeric'].includes(operator) && (
+            <div className={`rounded-md px-2.5 py-1.5 min-w-[120px] transition-all ${
+              selectedField.type === 'date'
+                ? 'bg-white border-2 border-[#4f44e0]'
+                : 'bg-[#f6f6f6] hover:bg-[#edecfc] hover:outline hover:outline-2 hover:outline-[#4f44e0]'
+            }`}>
+              <ValueInput
+                type={selectedField.type}
+                operator={operator}
+                value={value}
+                onChange={(val) => onValueChange(id, val)}
+              />
+            </div>
+          )}
         </>
       )}
 

@@ -21,22 +21,39 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
     },
   ]);
 
+  // Track combinator (and/or) state
+  const [combinator, setCombinator] = useState<'and' | 'or'>('and');
+
   // Filter out incomplete rules (missing field/operator/value)
   // Lets users gradually fill in a row without breaking the query
-  const buildQuery = useCallback((currentFilters: RuleType[]): RuleGroupType => {
+  // Some operators don't require a value (isSet, isNotSet, isNumeric, isNotNumeric)
+  const buildQuery = useCallback((currentFilters: RuleType[], currentCombinator: 'and' | 'or'): RuleGroupType => {
+    const operatorsWithoutValue = ['isSet', 'isNotSet', 'isNumeric', 'isNotNumeric'];
+
     return {
-      combinator: 'and',
-      rules: currentFilters.filter(
-        (f) => f.field && f.operator && f.value
-      ),
+      combinator: currentCombinator,
+      rules: currentFilters.filter((f) => {
+        if (!f.field || !f.operator) return false;
+        // If operator doesn't require value, it's complete
+        if (operatorsWithoutValue.includes(f.operator as string)) return true;
+        // Otherwise, value must be present
+        return f.value !== undefined && f.value !== '';
+      }),
     };
   }, []);
 
   // Single update point - keeps local state and parent callback in sync
   const updateQuery = useCallback((newFilters: RuleType[]) => {
     setFilters(newFilters);
-    onQueryChange(buildQuery(newFilters));
-  }, [buildQuery, onQueryChange]);
+    onQueryChange(buildQuery(newFilters, combinator));
+  }, [buildQuery, onQueryChange, combinator]);
+
+  // Handle combinator toggle
+  const toggleCombinator = useCallback(() => {
+    const newCombinator = combinator === 'and' ? 'or' : 'and';
+    setCombinator(newCombinator);
+    onQueryChange(buildQuery(filters, newCombinator));
+  }, [combinator, filters, buildQuery, onQueryChange]);
 
   // Reset operator and value when field changes
   // Different field types have different valid operators
@@ -48,9 +65,14 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
   }, [filters, updateQuery]);
 
   const handleOperatorChange = useCallback((id: string, operator: string) => {
-    const newFilters = filters.map((f) =>
-      f.id === id ? { ...f, operator } : f
-    );
+    const newFilters = filters.map((f) => {
+      if (f.id === id) {
+        // Reset value when changing operator to avoid format mismatch
+        // (e.g., switching from "between" with "date1,date2" to "after" with single date)
+        return { ...f, operator, value: '' };
+      }
+      return f;
+    });
     updateQuery(newFilters);
   }, [filters, updateQuery]);
 
@@ -118,6 +140,8 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
             onDuplicate={handleDuplicate}
             showRemove={filters.length > 1}
             showAnd={index > 0}
+            combinator={combinator}
+            onCombinatorToggle={toggleCombinator}
           />
         ))}
       </div>

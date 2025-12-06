@@ -33,6 +33,14 @@ function evaluateRule(user: User, rule: any): boolean {
   const fieldValue = user[rule.field as keyof User];
   const compareValue = rule.value;
 
+  // Handle "is set" and "is not set" operators first (work for all types)
+  if (rule.operator === 'isSet') {
+    return fieldValue !== null && fieldValue !== undefined && fieldValue !== '';
+  }
+  if (rule.operator === 'isNotSet') {
+    return fieldValue === null || fieldValue === undefined || fieldValue === '';
+  }
+
   // String comparisons - case insensitive
   if (typeof fieldValue === 'string') {
     const field = String(fieldValue).toLowerCase();
@@ -46,15 +54,30 @@ function evaluateRule(user: User, rule: any): boolean {
       case 'contains':
         return field.includes(val);
       case 'doesNotContain':
+      case 'notContains':
         return !field.includes(val);
+      case 'startsWith':
+        return field.startsWith(val);
+      case 'endsWith':
+        return field.endsWith(val);
       default:
         return false;
     }
   }
 
   if (typeof fieldValue === 'number') {
+    // Handle numeric validation operators
+    if (rule.operator === 'isNumeric') {
+      return !isNaN(fieldValue);
+    }
+    if (rule.operator === 'isNotNumeric') {
+      return isNaN(fieldValue);
+    }
+
     const num = Number(compareValue);
-    if (isNaN(num)) return false; // Reject invalid input
+    if (isNaN(num) && rule.operator !== 'between' && rule.operator !== 'notBetween') {
+      return false; // Reject invalid input
+    }
 
     switch (rule.operator) {
       case '=':
@@ -69,6 +92,18 @@ function evaluateRule(user: User, rule: any): boolean {
         return fieldValue >= num;
       case '<=':
         return fieldValue <= num;
+      case 'between': {
+        // Expect value to be "min,max" format
+        const [min, max] = String(compareValue).split(',').map(Number);
+        if (isNaN(min) || isNaN(max)) return false;
+        return fieldValue >= min && fieldValue <= max;
+      }
+      case 'notBetween': {
+        // Expect value to be "min,max" format
+        const [min, max] = String(compareValue).split(',').map(Number);
+        if (isNaN(min) || isNaN(max)) return false;
+        return fieldValue < min || fieldValue > max;
+      }
       default:
         return false;
     }
@@ -76,23 +111,83 @@ function evaluateRule(user: User, rule: any): boolean {
 
   if (fieldValue instanceof Date) {
     try {
-      const compareDate = new Date(compareValue);
-      if (isNaN(compareDate.getTime())) return false;
-
       // Normalize to midnight so time doesn't affect comparison
       // "Created on Dec 1" should match any time on that day
       const userDate = new Date(fieldValue.toDateString());
-      const testDate = new Date(compareDate.toDateString());
 
       switch (rule.operator) {
-        case '=':
+        case '=': {
+          const compareDate = new Date(compareValue);
+          if (isNaN(compareDate.getTime())) return false;
+          const testDate = new Date(compareDate.toDateString());
           return isEqual(userDate, testDate);
-        case '!=':
+        }
+        case '!=': {
+          const compareDate = new Date(compareValue);
+          if (isNaN(compareDate.getTime())) return false;
+          const testDate = new Date(compareDate.toDateString());
           return !isEqual(userDate, testDate);
-        case '>':
+        }
+        case '>': {
+          const compareDate = new Date(compareValue);
+          if (isNaN(compareDate.getTime())) return false;
+          const testDate = new Date(compareDate.toDateString());
           return isAfter(userDate, testDate);
-        case '<':
+        }
+        case '<': {
+          const compareDate = new Date(compareValue);
+          if (isNaN(compareDate.getTime())) return false;
+          const testDate = new Date(compareDate.toDateString());
           return isBefore(userDate, testDate);
+        }
+        case 'between': {
+          // Expect value to be "start,end" format
+          const [start, end] = String(compareValue).split(',');
+          const startDate = new Date(new Date(start).toDateString());
+          const endDate = new Date(new Date(end).toDateString());
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return false;
+          return (isEqual(userDate, startDate) || isAfter(userDate, startDate)) &&
+                 (isEqual(userDate, endDate) || isBefore(userDate, endDate));
+        }
+        case 'notBetween': {
+          // Expect value to be "start,end" format
+          const [start, end] = String(compareValue).split(',');
+          const startDate = new Date(new Date(start).toDateString());
+          const endDate = new Date(new Date(end).toDateString());
+          if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return false;
+          return isBefore(userDate, startDate) || isAfter(userDate, endDate);
+        }
+        case 'last': {
+          // Expect value to be "number,unit" format (e.g., "7,days" or "3,months")
+          const [amount, unit] = String(compareValue).split(',');
+          const num = parseInt(amount, 10);
+          if (isNaN(num)) return false;
+
+          const now = new Date(new Date().toDateString());
+          const msPerDay = 24 * 60 * 60 * 1000;
+          let cutoffDate: Date;
+
+          switch (unit) {
+            case 'days':
+              cutoffDate = new Date(now.getTime() - num * msPerDay);
+              break;
+            case 'weeks':
+              cutoffDate = new Date(now.getTime() - num * 7 * msPerDay);
+              break;
+            case 'months':
+              cutoffDate = new Date(now);
+              cutoffDate.setMonth(cutoffDate.getMonth() - num);
+              break;
+            case 'years':
+              cutoffDate = new Date(now);
+              cutoffDate.setFullYear(cutoffDate.getFullYear() - num);
+              break;
+            default:
+              return false;
+          }
+
+          return isEqual(userDate, cutoffDate) || isAfter(userDate, cutoffDate);
+        }
         default:
           return false;
       }
