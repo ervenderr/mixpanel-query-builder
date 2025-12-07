@@ -302,11 +302,11 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
     <div className="relative">
       {groups.map((group, groupIndex) => (
         <div key={group.id}>
-          {/* Horizontal separator and AND/OR button between groups */}
+          {/* Horizontal separator with AND/OR button centered on the line */}
           {groupIndex > 0 && (
-            <>
-              <div className="border-t border-[#e9e9e9] my-6" />
-              <div className="flex justify-center my-4">
+            <div className="relative my-6">
+              <div className="border-t border-[#e9e9e9]" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
                 <button
                   onClick={toggleCombinator}
                   className="px-4 py-1.5 text-[13px] font-medium text-white bg-[#4f44e0] hover:bg-[#3d35c0] rounded-md transition-colors uppercase"
@@ -314,63 +314,64 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
                   {combinator}
                 </button>
               </div>
-            </>
+            </div>
           )}
 
-          {/* ALL USERS group label with drag handle */}
+          {/* Entire group is draggable */}
           <div
             draggable
             onDragStart={() => handleDragStart(group.id)}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(group.id)}
-            className={`flex items-center gap-2 mb-3 text-[11px] text-[#8f8f91] uppercase tracking-wide font-medium cursor-move ${
-              draggedGroupId === group.id ? 'opacity-50' : ''
-            }`}
+            className={`${draggedGroupId === group.id ? 'opacity-50' : ''}`}
           >
-            {/* 6-dots drag handle icon */}
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
-              <circle cx="3" cy="3" r="1.5" />
-              <circle cx="8" cy="3" r="1.5" />
-              <circle cx="3" cy="8" r="1.5" />
-              <circle cx="8" cy="8" r="1.5" />
-              <circle cx="3" cy="13" r="1.5" />
-              <circle cx="8" cy="13" r="1.5" />
-            </svg>
-            ALL USERS
-          </div>
+            {/* ALL USERS group label with drag handle - shows cursor-move on hover */}
+            <div className="flex items-center gap-2 mb-3 text-[11px] text-[#8f8f91] uppercase tracking-wide font-medium cursor-move">
+              {/* 6-dots drag handle icon */}
+              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
+                <circle cx="3" cy="3" r="1.5" />
+                <circle cx="8" cy="3" r="1.5" />
+                <circle cx="3" cy="8" r="1.5" />
+                <circle cx="8" cy="8" r="1.5" />
+                <circle cx="3" cy="13" r="1.5" />
+                <circle cx="8" cy="13" r="1.5" />
+              </svg>
+              ALL USERS
+            </div>
 
-          {/* Filter rows */}
-          <div className="space-y-3 mb-3">
-            {group.filters.map((filter, index) => (
-              <FilterRow
-                key={filter.id}
-                id={filter.id!}
-                field={filter.field}
-                operator={filter.operator}
-                value={filter.value}
-                onFieldChange={(filterId, field) => handleFieldChange(group.id, filterId, field)}
-                onOperatorChange={(filterId, operator) => handleOperatorChange(group.id, filterId, operator)}
-                onValueChange={(filterId, value) => handleValueChange(group.id, filterId, value)}
-                onRemove={(filterId) => handleRemove(group.id, filterId)}
-                onDuplicate={(filterId) => handleDuplicate(group.id, filterId)}
-                showRemove={group.filters.length > 1 || groups.length > 1}
-                showAnd={index > 0}
-                combinator="and"
-                onCombinatorToggle={() => {}}
-              />
-            ))}
-          </div>
+            {/* Filter rows */}
+            <div className="space-y-3 mb-3">
+              {group.filters.map((filter, index) => (
+                <FilterRow
+                  key={filter.id}
+                  id={filter.id!}
+                  field={filter.field}
+                  operator={filter.operator}
+                  value={filter.value}
+                  onFieldChange={(filterId, field) => handleFieldChange(group.id, filterId, field)}
+                  onOperatorChange={(filterId, operator) => handleOperatorChange(group.id, filterId, operator)}
+                  onValueChange={(filterId, value) => handleValueChange(group.id, filterId, value)}
+                  onRemove={(filterId) => handleRemove(group.id, filterId)}
+                  onDuplicate={(filterId) => handleDuplicate(group.id, filterId)}
+                  showRemove={group.filters.length > 1 || groups.length > 1}
+                  showAnd={index > 0}
+                  combinator="and"
+                  onCombinatorToggle={() => {}}
+                />
+              ))}
+            </div>
 
-          {/* + Filter button for this group */}
-          <button
-            onClick={() => handleAddFilter(group.id)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#2a2a2f] hover:bg-[#f6f6f6] rounded transition-colors mb-4"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
-            </svg>
-            Filter
-          </button>
+            {/* + Filter button for this group */}
+            <button
+              onClick={() => handleAddFilter(group.id)}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-[#2a2a2f] hover:bg-[#f6f6f6] rounded transition-colors mb-4"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+              </svg>
+              Filter
+            </button>
+          </div>
         </div>
       ))}
 
