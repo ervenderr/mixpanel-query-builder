@@ -268,8 +268,34 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
   // Drag and drop state and handlers
   const [draggedGroupId, setDraggedGroupId] = useState<string | null>(null);
 
-  const handleDragStart = useCallback((groupId: string) => {
+  const handleDragStart = useCallback((e: React.DragEvent, groupId: string) => {
     setDraggedGroupId(groupId);
+
+    // Set custom drag image to show entire group with subtle border
+    // Find the parent group container (3 levels up from the drag icon)
+    const dragIcon = e.currentTarget as HTMLElement;
+    const groupContainer = dragIcon.parentElement?.parentElement;
+
+    if (groupContainer) {
+      // Clone the entire group container to use as drag image
+      const dragImage = groupContainer.cloneNode(true) as HTMLElement;
+      dragImage.style.position = 'absolute';
+      dragImage.style.top = '-9999px';
+      dragImage.style.width = `${groupContainer.offsetWidth}px`;
+      dragImage.style.backgroundColor = 'white';
+      dragImage.style.border = '1px solid #e9e9e9';
+      dragImage.style.borderRadius = '8px';
+      dragImage.style.padding = '12px';
+      dragImage.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.1)';
+      document.body.appendChild(dragImage);
+
+      e.dataTransfer.setDragImage(dragImage, 0, 0);
+
+      // Clean up after a short delay
+      setTimeout(() => {
+        document.body.removeChild(dragImage);
+      }, 0);
+    }
   }, []);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -317,26 +343,30 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
             </div>
           )}
 
-          {/* Entire group is draggable */}
+          {/* Group container */}
           <div
-            draggable
-            onDragStart={() => handleDragStart(group.id)}
             onDragOver={handleDragOver}
             onDrop={() => handleDrop(group.id)}
             className={`${draggedGroupId === group.id ? 'opacity-50' : ''}`}
           >
-            {/* ALL USERS group label with drag handle - shows cursor-move on hover */}
-            <div className="flex items-center gap-2 mb-3 text-[11px] text-[#8f8f91] uppercase tracking-wide font-medium cursor-move">
-              {/* 6-dots drag handle icon */}
-              <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
-                <circle cx="3" cy="3" r="1.5" />
-                <circle cx="8" cy="3" r="1.5" />
-                <circle cx="3" cy="8" r="1.5" />
-                <circle cx="8" cy="8" r="1.5" />
-                <circle cx="3" cy="13" r="1.5" />
-                <circle cx="8" cy="13" r="1.5" />
-              </svg>
-              ALL USERS
+            {/* ALL USERS group label - only the drag icon is draggable */}
+            <div className="flex items-center gap-2 mb-3 text-[11px] text-[#8f8f91] uppercase tracking-wide font-medium">
+              {/* 6-dots drag handle icon - this is the draggable part */}
+              <div
+                draggable
+                onDragStart={(e) => handleDragStart(e, group.id)}
+                className="cursor-move"
+              >
+                <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 16 16">
+                  <circle cx="3" cy="3" r="1.5" />
+                  <circle cx="8" cy="3" r="1.5" />
+                  <circle cx="3" cy="8" r="1.5" />
+                  <circle cx="8" cy="8" r="1.5" />
+                  <circle cx="3" cy="13" r="1.5" />
+                  <circle cx="8" cy="13" r="1.5" />
+                </svg>
+              </div>
+              <span>ALL USERS</span>
             </div>
 
             {/* Filter rows */}
