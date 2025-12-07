@@ -68,8 +68,8 @@ export default function ValueInput({ type, operator, value, onChange }: ValueInp
         type="number"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        placeholder="0"
-        className={`${baseClasses} w-full`}
+        placeholder="Value..."
+        className="w-full px-3 py-2 border-2 border-[#4f44e0] rounded-md text-sm outline-none font-light bg-white text-[#2a2a2f] placeholder:text-[#8f8f91]"
       />
     );
   }
@@ -92,7 +92,7 @@ export default function ValueInput({ type, operator, value, onChange }: ValueInp
       value={value}
       onChange={(e) => onChange(e.target.value)}
       placeholder="Enter value..."
-      className={`${baseClasses} w-full`}
+      className="w-full px-3 py-2 border-2 border-[#4f44e0] rounded-md text-sm outline-none font-light bg-white text-[#2a2a2f] placeholder:text-[#8f8f91]"
     />
   );
 }

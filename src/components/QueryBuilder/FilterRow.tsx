@@ -77,11 +77,7 @@ export default function FilterRow({
 
           {/* Value pill - only show if operator requires a value */}
           {!['isSet', 'isNotSet', 'isNumeric', 'isNotNumeric'].includes(operator) && (
-            <div className={`rounded-md px-2.5 py-1.5 min-w-[120px] transition-all ${
-              selectedField.type === 'date'
-                ? 'bg-white border-2 border-[#4f44e0]'
-                : 'bg-[#f6f6f6] hover:bg-[#edecfc] hover:outline hover:outline-2 hover:outline-[#4f44e0]'
-            }`}>
+            <div className="min-w-[120px]">
               <ValueInput
                 type={selectedField.type}
                 operator={operator}
