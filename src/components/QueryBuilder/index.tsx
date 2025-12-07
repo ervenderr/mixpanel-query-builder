@@ -12,6 +12,7 @@ interface QueryBuilderProps {
 interface FilterGroup {
   id: string;
   filters: RuleType[];
+  combinator: 'and' | 'or';
 }
 
 // Operators that don't require a value - moved outside component to avoid recreation
@@ -24,6 +25,7 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
   const [groups, setGroups] = useState<FilterGroup[]>([
     {
       id: crypto.randomUUID(),
+      combinator: 'and' as const,
       filters: [
         {
           id: crypto.randomUUID(),
@@ -80,12 +82,23 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
     onQueryChange(buildQuery(newGroups, combinator));
   }, [buildQuery, onQueryChange, combinator]);
 
-  // Handle combinator toggle
+  // Handle combinator toggle between groups
   const toggleCombinator = useCallback(() => {
     const newCombinator = combinator === 'and' ? 'or' : 'and';
     setCombinator(newCombinator);
     onQueryChange(buildQuery(groups, newCombinator));
   }, [combinator, groups, buildQuery, onQueryChange]);
+
+  // Handle combinator toggle within a group
+  const toggleGroupCombinator = useCallback((groupId: string) => {
+    const newGroups = groups.map(group =>
+      group.id === groupId
+        ? { ...group, combinator: group.combinator === 'and' ? 'or' as const : 'and' as const }
+        : group
+    );
+    setGroups(newGroups);
+    onQueryChange(buildQuery(newGroups, combinator));
+  }, [groups, combinator, buildQuery, onQueryChange]);
 
   // Reset operator and value when field changes
   // Different field types have different valid operators
@@ -178,6 +191,7 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
     if (newGroups.length === 0) {
       newGroups.push({
         id: crypto.randomUUID(),
+        combinator: 'and' as const,
         filters: [{
           id: crypto.randomUUID(),
           field: '',
@@ -237,6 +251,7 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
       ...groups,
       {
         id: crypto.randomUUID(),
+        combinator: 'and' as const,
         filters: [
           {
             id: crypto.randomUUID(),
@@ -253,6 +268,7 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
   const handleClearAll = useCallback(() => {
     const newGroups = [{
       id: crypto.randomUUID(),
+      combinator: 'and' as const,
       filters: [{
         id: crypto.randomUUID(),
         field: '',
@@ -385,8 +401,8 @@ export default function QueryBuilder({ onQueryChange }: QueryBuilderProps) {
                   onDuplicate={(filterId) => handleDuplicate(group.id, filterId)}
                   showRemove={group.filters.length > 1 || groups.length > 1}
                   showAnd={index > 0}
-                  combinator="and"
-                  onCombinatorToggle={() => {}}
+                  combinator={group.combinator}
+                  onCombinatorToggle={() => toggleGroupCombinator(group.id)}
                 />
               ))}
             </div>
